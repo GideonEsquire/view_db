@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+
+<body>
+  <input type="file" id="file">
+  <textarea id="sql">SELECT name FROM sqlite_master;</textarea>
+  <button id="run">Run</button>
+  <pre id="out"></pre>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.11.0/sql-wasm.js"></script>
+  <script>
+    initSqlJs({
+      locateFile: file => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.11.0/" + file
+    }).then(SQL => {
+      let db;
+
+      document.getElementById('file').onchange = async (e) => {
+        const buf = new Uint8Array(await e.target.files[0].arrayBuffer());
+        db = new SQL.Database(buf);
+      };
+
+      document.getElementById('run').onclick = () => {
+        if (!db) return alert("Load a .db file first");
+        const q = document.getElementById('sql').value;
+        const res = db.exec(q);
+        document.getElementById('out').textContent = JSON.stringify(res, null, 2);
+      };
+    });
+
+  </script>
+</body>
+
+</html>
